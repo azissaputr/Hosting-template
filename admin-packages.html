@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paket Hosting - Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Colors matching website */
+            --primary: #A78BFA;
+            --primary-dark: #8B5CF6;
+            --secondary: #93C5FD;
+            --accent: #FCA5A5;
+            --success: #86EFAC;
+            --warning: #FDE047;
+            --danger: #FCA5A5;
+
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #A78BFA 0%, #93C5FD 100%);
+            --gradient-card: linear-gradient(135deg, rgba(167, 139, 250, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
+
+            /* Light theme */
+            --bg-main: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --bg-sidebar: #FFFFFF;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --border: #E2E8F0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #0F172A;
+            --bg-card: #1E293B;
+            --bg-sidebar: #1E293B;
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --border: #334155;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ===== LAYOUT ===== */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .sidebar-nav {
+            padding: 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--gradient-card);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        /* ===== TOP BAR ===== */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-card);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border-radius: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .stat-card.revenue::before {
+            background: var(--gradient-primary);
+        }
+
+        .stat-card.orders::before {
+            background: linear-gradient(135deg, #86EFAC 0%, #34D399 100%);
+        }
+
+        .stat-card.customers::before {
+            background: linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%);
+        }
+
+        .stat-card.packages::before {
+            background: linear-gradient(135deg, #FDE047 0%, #FBBF24 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-card.revenue .stat-icon {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2) 0%, rgba(147, 197, 253, 0.2) 100%);
+        }
+
+        .stat-card.orders .stat-icon {
+            background: linear-gradient(135deg, rgba(134, 239, 172, 0.2) 0%, rgba(52, 211, 153, 0.2) 100%);
+        }
+
+        .stat-card.customers .stat-icon {
+            background: linear-gradient(135deg, rgba(147, 197, 253, 0.2) 0%, rgba(96, 165, 250, 0.2) 100%);
+        }
+
+        .stat-card.packages .stat-icon {
+            background: linear-gradient(135deg, rgba(253, 224, 71, 0.2) 0%, rgba(251, 191, 36, 0.2) 100%);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .trend-up {
+            color: #10B981;
+        }
+
+        .trend-down {
+            color: #EF4444;
+        }
+
+        /* ===== CONTENT GRID ===== */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* ===== TABLE ===== */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table thead {
+            background: var(--bg-main);
+        }
+
+        .table th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-main);
+        }
+
+        /* ===== BADGE ===== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(134, 239, 172, 0.2);
+            color: #10B981;
+        }
+
+        .badge-warning {
+            background: rgba(253, 224, 71, 0.2);
+            color: #F59E0B;
+        }
+
+        .badge-danger {
+            background: rgba(252, 165, 165, 0.2);
+            color: #EF4444;
+        }
+
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-main);
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .action-item:hover {
+            background: var(--gradient-card);
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .action-content {
+            flex: 1;
+        }
+
+        .action-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== PACKAGES PAGE SPECIFIC ===== */
+        .table-container {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-main);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .search-icon {
+            font-size: 1rem;
+        }
+
+        .search-input {
+            border: none;
+            background: transparent;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            width: 200px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: var(--bg-main);
+        }
+
+        .data-table th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--bg-main);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit {
+            background: rgba(147, 197, 253, 0.2);
+            color: #3B82F6;
+        }
+
+        .btn-edit:hover {
+            background: rgba(147, 197, 253, 0.3);
+        }
+
+        .btn-delete {
+            background: rgba(252, 165, 165, 0.2);
+            color: #EF4444;
+        }
+
+        .btn-delete:hover {
+            background: rgba(252, 165, 165, 0.3);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-main);
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--border);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* ===== FORM ===== */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn-secondary {
+            background: var(--bg-main);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="admin-page">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <span class="logo-icon">🚀</span>
+                    <span class="logo-text">Js Corp Hosting</span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="admin-dashboard.html" class="nav-link">
+                        <span class="nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="admin-packages.html" class="nav-link active">
+                        <span class="nav-icon">📦</span>
+                        <span>Paket Hosting</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="admin-customers.html" class="nav-link">
+                        <span class="nav-icon">👥</span>
+                        <span>Customers</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="admin-orders.html" class="nav-link">
+                        <span class="nav-icon">🛒</span>
+                        <span>Orders</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        <span>Ke Website</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="topbar">
+                <h1 class="page-title">Paket Hosting</h1>
+                <div class="topbar-actions">
+                    <button class="theme-toggle" id="themeToggle">
+                        <span id="themeIcon">🌙</span>
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-avatar">👤</div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Admin</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+
+            <!-- Packages Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h2 class="table-title">Daftar Paket Hosting</h2>
+                    <div class="table-actions">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" class="search-input" id="searchInput" placeholder="Cari paket...">
+                        </div>
+                        <button class="btn btn-primary" id="addPackageBtn">
+                            <span>+ Tambah Paket</span>
+                        </button>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Paket</th>
+                            <th>Harga/Bulan</th>
+                            <th>Harga/Tahun</th>
+                            <th>Storage</th>
+                            <th>Websites</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="packagesTable">
+                        <!-- Packages will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Package Modal -->
+    <div class="modal-overlay" id="packageModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Tambah Paket Hosting</h3>
+                <button class="modal-close" onclick="UI.closeModal('packageModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="packageForm">
+                    <input type="hidden" id="packageId">
+
+                    <div class="form-group">
+                        <label for="packageName">Nama Paket *</label>
+                        <input type="text" id="packageName" class="form-input" placeholder="e.g. Professional" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priceMonthly">Harga Bulanan (Rp) *</label>
+                        <input type="number" id="priceMonthly" class="form-input" placeholder="35000" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priceYearly">Harga Tahunan (Rp) *</label>
+                        <input type="number" id="priceYearly" class="form-input" placeholder="336000" required min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="storage">Storage *</label>
+                        <input type="text" id="storage" class="form-input" placeholder="5 GB SSD" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bandwidth">Bandwidth *</label>
+                        <input type="text" id="bandwidth" class="form-input" placeholder="Unlimited" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="websites">Jumlah Website *</label>
+                        <input type="number" id="websites" class="form-input" placeholder="5" required min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="text" id="email" class="form-input" placeholder="Unlimited" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="support">Support *</label>
+                        <input type="text" id="support" class="form-input" placeholder="Priority 24/7" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="features">Fitur (pisahkan dengan koma) *</label>
+                        <textarea id="features" class="form-input" rows="3"
+                            placeholder="5 GB SSD Storage, Unlimited Bandwidth, SSL Gratis" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="ssl">
+                            <span class="checkbox-custom"></span>
+                            <span>SSL Gratis</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="domain">
+                            <span class="checkbox-custom"></span>
+                            <span>Domain Gratis</span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" class="form-input" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="UI.closeModal('packageModal')">Batal</button>
+                <button class="btn btn-primary" id="savePackageBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-script.js"></script>
+    <script>
+        let currentPackageId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Auth.requireAuth();
+            initializePage();
+            loadPackages();
+        });
+
+        function initializePage() {
+            // User info
+            const user = Auth.getCurrentUser();
+            if (user) document.getElementById('userName').textContent = user.username;
+
+            // Theme toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            html.setAttribute('data-theme', currentTheme);
+            themeIcon.textContent = currentTheme === 'light' ? '🌙' : '☀️';
+            themeToggle.addEventListener('click', () => {
+                const theme = html.getAttribute('data-theme');
+                const newTheme = theme === 'light' ? 'dark' : 'light';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                themeIcon.textContent = newTheme === 'light' ? '🌙' : '☀️';
+            });
+
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                UI.confirm('Apakah Anda yakin ingin logout?', () => Auth.logout());
+            });
+
+            // Add package button
+            document.getElementById('addPackageBtn').addEventListener('click', () => {
+                openPackageModal();
+            });
+
+            // Save package button
+            document.getElementById('savePackageBtn').addEventListener('click', () => {
+                savePackage();
+            });
+
+            // Search with debounce
+            const debouncedSearch = debounce((query) => {
+                loadPackages(query);
+            }, 300);
+
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                debouncedSearch(e.target.value);
+            });
+        }
+
+        function loadPackages(searchQuery = '') {
+            const packages = searchQuery
+                ? DataStore.search('packages', searchQuery, ['name', 'storage', 'support'])
+                : DataStore.getAll('packages');
+
+            const tableBody = document.getElementById('packagesTable');
+
+            if (packages.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            ${searchQuery ? 'Tidak ada paket yang ditemukan' : 'Belum ada paket hosting'}
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // Use DocumentFragment for better performance
+            const fragment = document.createDocumentFragment();
+            const tempDiv = document.createElement('div');
+
+            tempDiv.innerHTML = packages.map(pkg => `
+                <tr>
+                    <td><strong>${pkg.name}</strong></td>
+                    <td>${UI.formatCurrency(pkg.price_monthly)}</td>
+                    <td>${UI.formatCurrency(pkg.price_yearly)}</td>
+                    <td>${pkg.storage}</td>
+                    <td>${pkg.websites === 999 ? 'Unlimited' : pkg.websites}</td>
+                    <td>${UI.getStatusBadge(pkg.status)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-edit" onclick="editPackage('${pkg.id}')" title="Edit">✏️</button>
+                            <button class="btn-icon btn-delete" onclick="deletePackage('${pkg.id}')" title="Hapus">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            while (tempDiv.firstChild) {
+                fragment.appendChild(tempDiv.firstChild);
+            }
+
+            tableBody.innerHTML = '';
+            tableBody.appendChild(fragment);
+        }
+
+        function openPackageModal(packageId = null) {
+            currentPackageId = packageId;
+            const modal = document.getElementById('packageModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const form = document.getElementById('packageForm');
+
+            if (packageId) {
+                // Edit mode
+                const pkg = DataStore.getById('packages', packageId);
+                if (!pkg) return;
+
+                modalTitle.textContent = 'Edit Paket Hosting';
+                document.getElementById('packageId').value = pkg.id;
+                document.getElementById('packageName').value = pkg.name;
+                document.getElementById('priceMonthly').value = pkg.price_monthly;
+                document.getElementById('priceYearly').value = pkg.price_yearly;
+                document.getElementById('storage').value = pkg.storage;
+                document.getElementById('bandwidth').value = pkg.bandwidth;
+                document.getElementById('websites').value = pkg.websites;
+                document.getElementById('email').value = pkg.email;
+                document.getElementById('support').value = pkg.support;
+                document.getElementById('features').value = pkg.features.join(', ');
+                document.getElementById('ssl').checked = pkg.ssl;
+                document.getElementById('domain').checked = pkg.domain;
+                document.getElementById('status').value = pkg.status;
+            } else {
+                // Add mode
+                modalTitle.textContent = 'Tambah Paket Hosting';
+                form.reset();
+                document.getElementById('ssl').checked = true;
+                document.getElementById('status').value = 'active';
+            }
+
+            UI.openModal('packageModal');
+        }
+
+        function savePackage() {
+            const packageData = {
+                name: document.getElementById('packageName').value,
+                price_monthly: parseInt(document.getElementById('priceMonthly').value),
+                price_yearly: parseInt(document.getElementById('priceYearly').value),
+                storage: document.getElementById('storage').value,
+                bandwidth: document.getElementById('bandwidth').value,
+                websites: parseInt(document.getElementById('websites').value),
+                email: document.getElementById('email').value,
+                support: document.getElementById('support').value,
+                features: document.getElementById('features').value.split(',').map(f => f.trim()),
+                ssl: document.getElementById('ssl').checked,
+                domain: document.getElementById('domain').checked,
+                status: document.getElementById('status').value
+            };
+
+            if (currentPackageId) {
+                // Update
+                DataStore.update('packages', currentPackageId, packageData);
+                UI.showNotification('Paket berhasil diupdate!', 'success');
+            } else {
+                // Create
+                DataStore.create('packages', packageData);
+                UI.showNotification('Paket berhasil ditambahkan!', 'success');
+            }
+
+            UI.closeModal('packageModal');
+            loadPackages();
+        }
+
+        function editPackage(id) {
+            openPackageModal(id);
+        }
+
+        function deletePackage(id) {
+            const pkg = DataStore.getById('packages', id);
+            if (!pkg) return;
+
+            UI.confirm(`Hapus paket "${pkg.name}"?`, () => {
+                DataStore.delete('packages', id);
+                UI.showNotification('Paket berhasil dihapus!', 'success');
+                loadPackages();
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="admin-page">
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🚀</span>
+                    <span class="logo-text">Js Corp Hosting</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="sidebar-nav-item"><a href="admin-dashboard.html" class="sidebar-nav-link"><span
+                                class="sidebar-nav-icon">📊</span><span>Dashboard</span></a></li>
+                    <li class="sidebar-nav-item"><a href="admin-packages.html" class="sidebar-nav-link"><span
+                                class="sidebar-nav-icon">📦</span><span>Paket Hosting</span></a></li>
+                    <li class="sidebar-nav-item"><a href="admin-customers.html" class="sidebar-nav-link"><span
+                                class="sidebar-nav-icon">👥</span><span>Customers</span></a></li>
+                    <li class="sidebar-nav-item"><a href="admin-orders.html" class="sidebar-nav-link active"><span
+                                class="sidebar-nav-icon">🛒</span><span>Orders</span></a></li>
+                    <li class="sidebar-nav-item"><a href="index.html" class="sidebar-nav-link"><span
+                                class="sidebar-nav-icon">🏠</span><span>Ke Website</span></a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-navbar">
+                <div class="navbar-title">
+                    <h1>Orders</h1>
+                    <div class="navbar-breadcrumb">Admin / Orders</div>
+                </div>
+                <div class="navbar-actions">
+                    <button class="theme-toggle" id="themeToggle"><span class="theme-icon">🌙</span></button>
+                    <div class="navbar-user">
+                        <div class="user-avatar">👤</div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Admin</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h2 class="table-title">Daftar Orders</h2>
+                    <div class="table-actions">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" class="search-input" id="searchInput" placeholder="Cari order...">
+                        </div>
+                        <button class="btn btn-primary" id="addOrderBtn">+ Tambah Order</button>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order Number</th>
+                            <th>Customer</th>
+                            <th>Paket</th>
+                            <th>Billing</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTable"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Order Modal -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Tambah Order</h3>
+                <button class="modal-close" onclick="UI.closeModal('orderModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="orderForm">
+                    <input type="hidden" id="orderId">
+                    <div class="form-group">
+                        <label for="orderNumber">Order Number *</label>
+                        <input type="text" id="orderNumber" class="form-input" placeholder="ORD-20260213-001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customerId">Customer *</label>
+                        <select id="customerId" class="form-input" required>
+                            <option value="">Pilih customer...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="packageId">Paket *</label>
+                        <select id="packageId" class="form-input" required>
+                            <option value="">Pilih paket...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="billingCycle">Billing Cycle *</label>
+                        <select id="billingCycle" class="form-input" required>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount (Rp) *</label>
+                        <input type="number" id="amount" class="form-input" placeholder="35000" required min="0"
+                            readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="startDate">Start Date *</label>
+                        <input type="date" id="startDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date *</label>
+                        <input type="date" id="endDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" class="form-input" required>
+                            <option value="pending">Pending</option>
+                            <option value="active">Active</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="UI.closeModal('orderModal')">Batal</button>
+                <button class="btn btn-primary" id="saveOrderBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="admin-script.js"></script>
+    <script>
+        Auth.requireAuth();
+        let currentOrderId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePage();
+            loadOrders();
+        });
+
+        function initializePage() {
+            const user = Auth.getCurrentUser();
+            if (user) document.getElementById('userName').textContent = user.username;
+
+            const themeToggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            const themeIcon = themeToggle.querySelector('.theme-icon');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            html.setAttribute('data-theme', currentTheme);
+            themeIcon.textContent = currentTheme === 'light' ? '🌙' : '☀️';
+            themeToggle.addEventListener('click', () => {
+                const theme = html.getAttribute('data-theme');
+                const newTheme = theme === 'light' ? 'dark' : 'light';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                themeIcon.textContent = newTheme === 'light' ? '🌙' : '☀️';
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                UI.confirm('Apakah Anda yakin ingin logout?', () => Auth.logout());
+            });
+
+            document.getElementById('addOrderBtn').addEventListener('click', () => openOrderModal());
+            document.getElementById('saveOrderBtn').addEventListener('click', () => saveOrder());
+            document.getElementById('searchInput').addEventListener('input', (e) => loadOrders(e.target.value));
+
+            // Auto-calculate amount when package or billing cycle changes
+            document.getElementById('packageId').addEventListener('change', updateAmount);
+            document.getElementById('billingCycle').addEventListener('change', updateAmount);
+
+            // Auto-calculate end date when start date or billing cycle changes
+            document.getElementById('startDate').addEventListener('change', updateEndDate);
+            document.getElementById('billingCycle').addEventListener('change', updateEndDate);
+        }
+
+        function loadOrders(searchQuery = '') {
+            const orders = DataStore.getAll('orders');
+            const customers = DataStore.getAll('customers');
+            const packages = DataStore.getAll('packages');
+
+            // Enrich orders with customer and package names
+            let enrichedOrders = orders.map(order => {
+                const customer = customers.find(c => c.id === order.customer_id);
+                const pkg = packages.find(p => p.id === order.package_id);
+                return {
+                    ...order,
+                    customer_name: customer ? customer.name : 'Unknown',
+                    package_name: pkg ? pkg.name : 'Unknown'
+                };
+            });
+
+            // Filter by search query
+            if (searchQuery) {
+                const lowerQuery = searchQuery.toLowerCase();
+                enrichedOrders = enrichedOrders.filter(order =>
+                    order.order_number.toLowerCase().includes(lowerQuery) ||
+                    order.customer_name.toLowerCase().includes(lowerQuery) ||
+                    order.package_name.toLowerCase().includes(lowerQuery)
+                );
+            }
+
+            const tableBody = document.getElementById('ordersTable');
+
+            if (enrichedOrders.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">${searchQuery ? 'Tidak ada order yang ditemukan' : 'Belum ada order'}</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = enrichedOrders.map(order => `
+                <tr>
+                    <td><strong>${order.order_number}</strong></td>
+                    <td>${order.customer_name}</td>
+                    <td>${order.package_name}</td>
+                    <td><span class="badge badge-info">${order.billing_cycle}</span></td>
+                    <td>${UI.formatCurrency(order.amount)}</td>
+                    <td>${UI.getStatusBadge(order.status)}</td>
+                    <td>${UI.formatDate(order.start_date)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-edit" onclick="editOrder('${order.id}')" title="Edit">✏️</button>
+                            <button class="btn-icon btn-delete" onclick="deleteOrder('${order.id}')" title="Hapus">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openOrderModal(orderId = null) {
+            currentOrderId = orderId;
+            const modalTitle = document.getElementById('modalTitle');
+            const form = document.getElementById('orderForm');
+
+            // Populate customer and package dropdowns
+            populateCustomers();
+            populatePackages();
+
+            if (orderId) {
+                const order = DataStore.getById('orders', orderId);
+                if (!order) return;
+                modalTitle.textContent = 'Edit Order';
+                document.getElementById('orderId').value = order.id;
+                document.getElementById('orderNumber').value = order.order_number;
+                document.getElementById('customerId').value = order.customer_id;
+                document.getElementById('packageId').value = order.package_id;
+                document.getElementById('billingCycle').value = order.billing_cycle;
+                document.getElementById('amount').value = order.amount;
+                document.getElementById('startDate').value = order.start_date;
+                document.getElementById('endDate').value = order.end_date;
+                document.getElementById('status').value = order.status;
+            } else {
+                modalTitle.textContent = 'Tambah Order';
+                form.reset();
+                document.getElementById('status').value = 'pending';
+                // Generate order number
+                const today = new Date();
+                const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
+                const orderCount = DataStore.getAll('orders').length + 1;
+                document.getElementById('orderNumber').value = `ORD-${dateStr}-${String(orderCount).padStart(3, '0')}`;
+                // Set default start date to today
+                document.getElementById('startDate').value = today.toISOString().split('T')[0];
+            }
+
+            UI.openModal('orderModal');
+        }
+
+        function populateCustomers() {
+            const customers = DataStore.getAll('customers').filter(c => c.status === 'active');
+            const select = document.getElementById('customerId');
+            const currentValue = select.value;
+
+            select.innerHTML = '<option value="">Pilih customer...</option>' +
+                customers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+            if (currentValue) select.value = currentValue;
+        }
+
+        function populatePackages() {
+            const packages = DataStore.getAll('packages').filter(p => p.status === 'active');
+            const select = document.getElementById('packageId');
+            const currentValue = select.value;
+
+            select.innerHTML = '<option value="">Pilih paket...</option>' +
+                packages.map(p => `<option value="${p.id}">${p.name} - ${UI.formatCurrency(p.price_monthly)}/bulan</option>`).join('');
+
+            if (currentValue) select.value = currentValue;
+        }
+
+        function updateAmount() {
+            const packageId = document.getElementById('packageId').value;
+            const billingCycle = document.getElementById('billingCycle').value;
+
+            if (!packageId) return;
+
+            const pkg = DataStore.getById('packages', packageId);
+            if (!pkg) return;
+
+            const amount = billingCycle === 'yearly' ? pkg.price_yearly : pkg.price_monthly;
+            document.getElementById('amount').value = amount;
+        }
+
+        function updateEndDate() {
+            const startDate = document.getElementById('startDate').value;
+            const billingCycle = document.getElementById('billingCycle').value;
+
+            if (!startDate) return;
+
+            const start = new Date(startDate);
+            const end = new Date(start);
+
+            if (billingCycle === 'yearly') {
+                end.setFullYear(end.getFullYear() + 1);
+            } else {
+                end.setMonth(end.getMonth() + 1);
+            }
+
+            document.getElementById('endDate').value = end.toISOString().split('T')[0];
+        }
+
+        function saveOrder() {
+            const orderData = {
+                order_number: document.getElementById('orderNumber').value,
+                customer_id: document.getElementById('customerId').value,
+                package_id: document.getElementById('packageId').value,
+                billing_cycle: document.getElementById('billingCycle').value,
+                amount: parseInt(document.getElementById('amount').value),
+                start_date: document.getElementById('startDate').value,
+                end_date: document.getElementById('endDate').value,
+                status: document.getElementById('status').value
+            };
+
+            if (currentOrderId) {
+                DataStore.update('orders', currentOrderId, orderData);
+                UI.showNotification('Order berhasil diupdate!', 'success');
+            } else {
+                DataStore.create('orders', orderData);
+                UI.showNotification('Order berhasil ditambahkan!', 'success');
+            }
+
+            UI.closeModal('orderModal');
+            loadOrders();
+        }
+
+        function editOrder(id) {
+            openOrderModal(id);
+        }
+
+        function deleteOrder(id) {
+            const order = DataStore.getById('orders', id);
+            if (!order) return;
+
+            UI.confirm(`Hapus order "${order.order_number}"?`, () => {
+                DataStore.delete('orders', id);
+                UI.showNotification('Order berhasil dihapus!', 'success');
+                loadOrders();
+            });
+        }
+    </script>
+</body>
+
+</html>

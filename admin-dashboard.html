@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Js Corp Hosting Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Colors matching website */
+            --primary: #A78BFA;
+            --primary-dark: #8B5CF6;
+            --secondary: #93C5FD;
+            --accent: #FCA5A5;
+            --success: #86EFAC;
+            --warning: #FDE047;
+            --danger: #FCA5A5;
+
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #A78BFA 0%, #93C5FD 100%);
+            --gradient-card: linear-gradient(135deg, rgba(167, 139, 250, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
+
+            /* Light theme */
+            --bg-main: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --bg-sidebar: #FFFFFF;
+            --text-primary: #1E293B;
+            --text-secondary: #64748B;
+            --border: #E2E8F0;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #0F172A;
+            --bg-card: #1E293B;
+            --bg-sidebar: #1E293B;
+            --text-primary: #F1F5F9;
+            --text-secondary: #94A3B8;
+            --border: #334155;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ===== LAYOUT ===== */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .sidebar-nav {
+            padding: 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--gradient-card);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .nav-icon {
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 2rem;
+        }
+
+        /* ===== TOP BAR ===== */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-card);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border-radius: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .stat-card.revenue::before {
+            background: var(--gradient-primary);
+        }
+
+        .stat-card.orders::before {
+            background: linear-gradient(135deg, #86EFAC 0%, #34D399 100%);
+        }
+
+        .stat-card.customers::before {
+            background: linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%);
+        }
+
+        .stat-card.packages::before {
+            background: linear-gradient(135deg, #FDE047 0%, #FBBF24 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-card.revenue .stat-icon {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.2) 0%, rgba(147, 197, 253, 0.2) 100%);
+        }
+
+        .stat-card.orders .stat-icon {
+            background: linear-gradient(135deg, rgba(134, 239, 172, 0.2) 0%, rgba(52, 211, 153, 0.2) 100%);
+        }
+
+        .stat-card.customers .stat-icon {
+            background: linear-gradient(135deg, rgba(147, 197, 253, 0.2) 0%, rgba(96, 165, 250, 0.2) 100%);
+        }
+
+        .stat-card.packages .stat-icon {
+            background: linear-gradient(135deg, rgba(253, 224, 71, 0.2) 0%, rgba(251, 191, 36, 0.2) 100%);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .trend-up {
+            color: #10B981;
+        }
+
+        .trend-down {
+            color: #EF4444;
+        }
+
+        /* ===== CONTENT GRID ===== */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* ===== TABLE ===== */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table thead {
+            background: var(--bg-main);
+        }
+
+        .table th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-main);
+        }
+
+        /* ===== BADGE ===== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(134, 239, 172, 0.2);
+            color: #10B981;
+        }
+
+        .badge-warning {
+            background: rgba(253, 224, 71, 0.2);
+            color: #F59E0B;
+        }
+
+        .badge-danger {
+            background: rgba(252, 165, 165, 0.2);
+            color: #EF4444;
+        }
+
+        /* ===== QUICK ACTIONS ===== */
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-main);
+            border-radius: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .action-item:hover {
+            background: var(--gradient-card);
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 0.5rem;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .action-content {
+            flex: 1;
+        }
+
+        .action-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body class="admin-page">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <span class="logo-icon">🚀</span>
+                    <span class="logo-text">Js Corp Hosting</span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="admin-dashboard.html" class="nav-link active">
+                        <span class="nav-icon">📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="admin-packages.html" class="nav-link">
+                        <span class="nav-icon">📦</span>
+                        <span>Paket Hosting</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="admin-customers.html" class="nav-link">
+                        <span class="nav-icon">👥</span>
+                        <span>Customers</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="admin-orders.html" class="nav-link">
+                        <span class="nav-icon">🛒</span>
+                        <span>Orders</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        <span>Ke Website</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="topbar">
+                <h1 class="page-title">Dashboard</h1>
+                <div class="topbar-actions">
+                    <button class="theme-toggle" id="themeToggle">
+                        <span id="themeIcon">🌙</span>
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-avatar">👤</div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Admin</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid">
+                <!-- Stats will be populated by JavaScript -->
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <!-- Recent Orders -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Orders</h3>
+                        <a href="admin-orders.html"
+                            style="color: var(--primary); text-decoration: none; font-size: 0.875rem; font-weight: 600;">View
+                            All →</a>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <table class="table" id="recentOrdersTable">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Package</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentOrdersBody">
+                                <!-- Orders will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions">
+                            <a href="admin-packages.html" class="action-item"
+                                style="text-decoration: none; color: inherit;">
+                                <div class="action-icon">📦</div>
+                                <div class="action-content">
+                                    <div class="action-title">Add Package</div>
+                                    <div class="action-subtitle">Create new hosting package</div>
+                                </div>
+                            </a>
+                            <a href="admin-customers.html" class="action-item"
+                                style="text-decoration: none; color: inherit;">
+                                <div class="action-icon">👥</div>
+                                <div class="action-content">
+                                    <div class="action-title">Add Customer</div>
+                                    <div class="action-subtitle">Register new customer</div>
+                                </div>
+                            </a>
+                            <a href="admin-orders.html" class="action-item"
+                                style="text-decoration: none; color: inherit;">
+                                <div class="action-icon">🛒</div>
+                                <div class="action-content">
+                                    <div class="action-title">New Order</div>
+                                    <div class="action-subtitle">Create new order</div>
+                                </div>
+                            </a>
+                            <a href="index.html" class="action-item" style="text-decoration: none; color: inherit;">
+                                <div class="action-icon">🏠</div>
+                                <div class="action-content">
+                                    <div class="action-title">View Website</div>
+                                    <div class="action-subtitle">Go to landing page</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="admin-script.js"></script>
+    <script>
+        // Protect page - require authentication
+        if (typeof Auth !== 'undefined') {
+            Auth.requireAuth();
+
+            // Update user name
+            const user = Auth.getCurrentUser();
+            if (user) {
+                document.getElementById('userName').textContent = user.username;
+            }
+        }
+
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const html = document.documentElement;
+
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+        themeIcon.textContent = currentTheme === 'light' ? '🌙' : '☀️';
+
+        themeToggle.addEventListener('click', () => {
+            const theme = html.getAttribute('data-theme');
+            const newTheme = theme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeIcon.textContent = newTheme === 'light' ? '🌙' : '☀️';
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                if (typeof Auth !== 'undefined') {
+                    Auth.logout();
+                } else {
+                    window.location.href = 'admin-login.html';
+                }
+            }
+        });
+
+        // Load dashboard data
+        function loadDashboardData() {
+            if (typeof DataStore === 'undefined' || typeof DashboardStats === 'undefined') {
+                console.warn('DataStore or DashboardStats not available');
+                return;
+            }
+
+            // Load stats
+            const stats = DashboardStats.getStats();
+            const statsGrid = document.getElementById('statsGrid');
+
+            statsGrid.innerHTML = `
+                <div class="stat-card revenue">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-title">Total Revenue</div>
+                        </div>
+                        <div class="stat-icon">💰</div>
+                    </div>
+                    <div class="stat-value">Rp ${stats.totalRevenue.toLocaleString('id-ID')}</div>
+                    <div class="stat-trend trend-up">
+                        <span>↗</span>
+                        <span>+12.5% from last month</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card orders">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-title">Total Orders</div>
+                        </div>
+                        <div class="stat-icon">🛒</div>
+                    </div>
+                    <div class="stat-value">${stats.totalOrders}</div>
+                    <div class="stat-trend trend-up">
+                        <span>↗</span>
+                        <span>${stats.activeOrders} active orders</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card customers">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-title">Total Customers</div>
+                        </div>
+                        <div class="stat-icon">👥</div>
+                    </div>
+                    <div class="stat-value">${stats.totalCustomers}</div>
+                    <div class="stat-trend trend-up">
+                        <span>↗</span>
+                        <span>${stats.activeCustomers} active</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card packages">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-title">Total Packages</div>
+                        </div>
+                        <div class="stat-icon">📦</div>
+                    </div>
+                    <div class="stat-value">${stats.totalPackages}</div>
+                    <div class="stat-trend trend-up">
+                        <span>↗</span>
+                        <span>All active</span>
+                    </div>
+                </div>
+            `;
+
+            // Load recent orders
+            const recentOrders = DashboardStats.getRecentActivity(5);
+            const tbody = document.getElementById('recentOrdersBody');
+
+            if (recentOrders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-secondary);">No orders yet</td></tr>';
+            } else {
+                tbody.innerHTML = recentOrders.map(order => `
+                    <tr>
+                        <td>${order.customer_name}</td>
+                        <td>${order.package_name}</td>
+                        <td>Rp ${order.amount.toLocaleString('id-ID')}</td>
+                        <td>${getStatusBadge(order.status)}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'active': '<span class="badge badge-success">Active</span>',
+                'pending': '<span class="badge badge-warning">Pending</span>',
+                'cancelled': '<span class="badge badge-danger">Cancelled</span>'
+            };
+            return badges[status] || status;
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+    </script>
+</body>
+
+</html>

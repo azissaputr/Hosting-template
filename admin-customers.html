@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers - Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="admin-page">
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🚀</span>
+                    <span class="logo-text">Js Corp Hosting</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="sidebar-nav-item"><a href="admin-dashboard.html" class="sidebar-nav-link"><span
+                                class="sidebar-nav-icon">📊</span><span>Dashboard</span></a></li>
+                    <li class="sidebar-nav-item"><a href="admin-packages.html" class="sidebar-nav-link"><span
+                                class="sidebar-nav-icon">📦</span><span>Paket Hosting</span></a></li>
+                    <li class="sidebar-nav-item"><a href="admin-customers.html" class="sidebar-nav-link active"><span
+                                class="sidebar-nav-icon">👥</span><span>Customers</span></a></li>
+                    <li class="sidebar-nav-item"><a href="admin-orders.html" class="sidebar-nav-link"><span
+                                class="sidebar-nav-icon">🛒</span><span>Orders</span></a></li>
+                    <li class="sidebar-nav-item"><a href="index.html" class="sidebar-nav-link"><span
+                                class="sidebar-nav-icon">🏠</span><span>Ke Website</span></a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <div class="admin-navbar">
+                <div class="navbar-title">
+                    <h1>Customers</h1>
+                    <div class="navbar-breadcrumb">Admin / Customers</div>
+                </div>
+                <div class="navbar-actions">
+                    <button class="theme-toggle" id="themeToggle"><span class="theme-icon">🌙</span></button>
+                    <div class="navbar-user">
+                        <div class="user-avatar">👤</div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">Admin</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h2 class="table-title">Daftar Customers</h2>
+                    <div class="table-actions">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" class="search-input" id="searchInput" placeholder="Cari customer...">
+                        </div>
+                        <button class="btn btn-primary" id="addCustomerBtn">+ Tambah Customer</button>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTable"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Customer Modal -->
+    <div class="modal-overlay" id="customerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Tambah Customer</h3>
+                <button class="modal-close" onclick="UI.closeModal('customerModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="customerForm">
+                    <input type="hidden" id="customerId">
+                    <div class="form-group">
+                        <label for="customerName">Nama *</label>
+                        <input type="text" id="customerName" class="form-input" placeholder="Nama lengkap" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" class="form-input" placeholder="email@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone *</label>
+                        <input type="tel" id="phone" class="form-input" placeholder="08123456789" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company">Company</label>
+                        <input type="text" id="company" class="form-input" placeholder="Nama perusahaan">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <textarea id="address" class="form-input" rows="2" placeholder="Alamat lengkap"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" class="form-input" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="UI.closeModal('customerModal')">Batal</button>
+                <button class="btn btn-primary" id="saveCustomerBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="admin-script.js"></script>
+    <script>
+        Auth.requireAuth();
+        let currentCustomerId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePage();
+            loadCustomers();
+        });
+
+        function initializePage() {
+            const user = Auth.getCurrentUser();
+            if (user) document.getElementById('userName').textContent = user.username;
+
+            const themeToggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            const themeIcon = themeToggle.querySelector('.theme-icon');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            html.setAttribute('data-theme', currentTheme);
+            themeIcon.textContent = currentTheme === 'light' ? '🌙' : '☀️';
+            themeToggle.addEventListener('click', () => {
+                const theme = html.getAttribute('data-theme');
+                const newTheme = theme === 'light' ? 'dark' : 'light';
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                themeIcon.textContent = newTheme === 'light' ? '🌙' : '☀️';
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                UI.confirm('Apakah Anda yakin ingin logout?', () => Auth.logout());
+            });
+
+            document.getElementById('addCustomerBtn').addEventListener('click', () => openCustomerModal());
+            document.getElementById('saveCustomerBtn').addEventListener('click', () => saveCustomer());
+            document.getElementById('searchInput').addEventListener('input', (e) => loadCustomers(e.target.value));
+        }
+
+        function loadCustomers(searchQuery = '') {
+            const customers = searchQuery
+                ? DataStore.search('customers', searchQuery, ['name', 'email', 'company'])
+                : DataStore.getAll('customers');
+
+            const tableBody = document.getElementById('customersTable');
+
+            if (customers.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-secondary);">${searchQuery ? 'Tidak ada customer yang ditemukan' : 'Belum ada customer'}</td></tr>`;
+                return;
+            }
+
+            tableBody.innerHTML = customers.map(customer => `
+                <tr>
+                    <td><strong>${customer.name}</strong></td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone}</td>
+                    <td>${customer.company || '-'}</td>
+                    <td>${UI.getStatusBadge(customer.status)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-edit" onclick="editCustomer('${customer.id}')" title="Edit">✏️</button>
+                            <button class="btn-icon btn-delete" onclick="deleteCustomer('${customer.id}')" title="Hapus">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openCustomerModal(customerId = null) {
+            currentCustomerId = customerId;
+            const modalTitle = document.getElementById('modalTitle');
+            const form = document.getElementById('customerForm');
+
+            if (customerId) {
+                const customer = DataStore.getById('customers', customerId);
+                if (!customer) return;
+                modalTitle.textContent = 'Edit Customer';
+                document.getElementById('customerId').value = customer.id;
+                document.getElementById('customerName').value = customer.name;
+                document.getElementById('email').value = customer.email;
+                document.getElementById('phone').value = customer.phone;
+                document.getElementById('company').value = customer.company || '';
+                document.getElementById('address').value = customer.address || '';
+                document.getElementById('status').value = customer.status;
+            } else {
+                modalTitle.textContent = 'Tambah Customer';
+                form.reset();
+                document.getElementById('status').value = 'active';
+            }
+
+            UI.openModal('customerModal');
+        }
+
+        function saveCustomer() {
+            const customerData = {
+                name: document.getElementById('customerName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                company: document.getElementById('company').value,
+                address: document.getElementById('address').value,
+                status: document.getElementById('status').value
+            };
+
+            if (currentCustomerId) {
+                DataStore.update('customers', currentCustomerId, customerData);
+                UI.showNotification('Customer berhasil diupdate!', 'success');
+            } else {
+                DataStore.create('customers', customerData);
+                UI.showNotification('Customer berhasil ditambahkan!', 'success');
+            }
+
+            UI.closeModal('customerModal');
+            loadCustomers();
+        }
+
+        function editCustomer(id) {
+            openCustomerModal(id);
+        }
+
+        function deleteCustomer(id) {
+            const customer = DataStore.getById('customers', id);
+            if (!customer) return;
+
+            UI.confirm(`Hapus customer "${customer.name}"?`, () => {
+                DataStore.delete('customers', id);
+                UI.showNotification('Customer berhasil dihapus!', 'success');
+                loadCustomers();
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Js Corp Hosting</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-left">
+            <div class="login-branding">
+                <div class="logo">
+                    <span class="logo-icon">🚀</span>
+                    <span class="logo-text">Js Corp Hosting</span>
+                </div>
+                <h1>Admin Panel</h1>
+                <p>Kelola hosting, customer, dan orders dengan mudah</p>
+            </div>
+            <div class="login-illustration">
+                <div class="floating-card card-1"></div>
+                <div class="floating-card card-2"></div>
+                <div class="floating-card card-3"></div>
+            </div>
+        </div>
+
+        <div class="login-right">
+            <div class="login-form-container">
+                <div class="login-header">
+                    <h2>Selamat Datang Kembali!</h2>
+                    <p>Silakan login untuk melanjutkan</p>
+                </div>
+
+                <form id="loginForm" class="login-form">
+                    <div class="alert alert-error" id="errorAlert" style="display: none;">
+                        <span class="alert-icon">⚠️</span>
+                        <span class="alert-message" id="errorMessage"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="username" name="username" class="form-input"
+                                placeholder="Masukkan username" required autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="password" name="password" class="form-input"
+                                placeholder="Masukkan password" required autocomplete="current-password">
+                            <button type="button" class="toggle-password" id="togglePassword">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="rememberMe" name="rememberMe">
+                            <span class="checkbox-custom"></span>
+                            <span>Ingat saya</span>
+                        </label>
+                        <a href="#" class="forgot-password">Lupa password?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-large" id="loginBtn">
+                        <span id="loginBtnText">Login</span>
+                        <span id="loginBtnLoader" class="btn-loader" style="display: none;">
+                            <span class="spinner"></span>
+                        </span>
+                    </button>
+                </form>
+
+                <div class="login-footer">
+                    <p>Default credentials: <code>admin</code> / <code>admin123</code></p>
+                    <a href="index.html" class="back-to-home">← Kembali ke Beranda</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-script.js"></script>
+    <script>
+        // Initialize login page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if already logged in
+            if (Auth.isAuthenticated()) {
+                window.location.href = 'admin-dashboard.html';
+            }
+
+            // Handle login form submission
+            const loginForm = document.getElementById('loginForm');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const loginBtnLoader = document.getElementById('loginBtnLoader');
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                // Hide previous errors
+                errorAlert.style.display = 'none';
+
+                // Show loading state
+                loginBtn.disabled = true;
+                loginBtnText.style.display = 'none';
+                loginBtnLoader.style.display = 'inline-flex';
+
+                // Get form data
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const rememberMe = document.getElementById('rememberMe').checked;
+
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                // Attempt login
+                const result = Auth.login(username, password, rememberMe);
+
+                if (result.success) {
+                    // Show success and redirect
+                    UI.showNotification('Login berhasil! Mengalihkan...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'admin-dashboard.html';
+                    }, 500);
+                } else {
+                    // Show error
+                    errorMessage.textContent = result.message;
+                    errorAlert.style.display = 'flex';
+
+                    // Reset button state
+                    loginBtn.disabled = false;
+                    loginBtnText.style.display = 'inline';
+                    loginBtnLoader.style.display = 'none';
+                }
+            });
+
+            // Toggle password visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = togglePassword.querySelector('.eye-icon');
+
+            togglePassword.addEventListener('click', () => {
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
+                eyeIcon.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+
+            // Auto-fill demo credentials on forgot password click
+            document.querySelector('.forgot-password').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('username').value = 'admin';
+                document.getElementById('password').value = 'admin123';
+                UI.showNotification('Demo credentials filled!', 'info');
+            });
+        });
+    </script>
+</body>
+
+</html>
